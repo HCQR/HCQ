@@ -1,0 +1,35 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    int variants,method;
+    cout<<"Enter selection method"<<endl;
+    cin>>method;
+    cout<<"Enter number of variants"<<endl;
+    cin>>variants;
+    switch (method) {
+    case 1:
+        int number;
+        cout<<"Enter number in list"<<endl;
+        cin>>number;
+        cout<<(number%variants)+1; 
+        break;
+    case 2:
+        char name;
+        cout<<"Enter your name"<<endl;
+        cin>>name;
+        cout<<(name%variants)+1;
+        break;
+    case 3:
+        char SecondName;
+        cout<<"Enter your SecondName"<<endl;
+        cin>>SecondName;
+        cout<<(SecondName%variants)+1;
+        break;
+    default: 
+        cout<<"Enter right method number";
+    }
+    return 0;
+}
