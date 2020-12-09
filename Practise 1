@@ -1,0 +1,120 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+int x;
+int y;
+int color;
+
+class image {
+  int mx;
+  int my;
+  int data[100000];
+
+    public:
+         image (int tmx, int tmy) {
+            for(int i=0;i<10000;i++)
+            data[i] = 0;
+         }
+         int GetMx(int x){
+             mx=x;
+             return mx;
+         }
+         int GetMy(int y){
+             my=y;
+             return my;
+         }
+         void show(){
+             int l=0;
+                for(int i=0; i<mx*my; i++){
+                cout<<data[i];
+                l++;
+                if(l%mx==0){
+                    cout<<endl;
+                }
+                }
+             }
+         int get(int x,int y){
+            cin>>color;
+            return color;
+         }
+         void set(int x, int y, int color){
+             data[(mx*y)+x]=color;
+         }
+         void save(){
+             int counter;
+             ofstream file("G.pnm");
+             if(color==0){
+                 file<<"P1"<<endl<<mx<<" "<<my<<endl;
+                 for(int i=0; i<mx*my; i++){
+                     file<<data[i];
+                     counter++;
+                     if (counter==mx){
+                         file<<endl;
+                         counter=0;
+                     }
+                 }
+                  counter =0;
+                  file.close();
+                  
+             }
+             else {
+                 file<<"P3"<<endl<<mx<<" "<<my<<endl;
+                 for(int i=0; i<mx*my;i++){
+                     file<<data[i]<<" ";
+                     counter++;
+                     if(counter==mx){
+                         file<<endl;
+                         counter=0;
+                     }
+                 }
+                 counter=0;
+                 file.close();
+             }
+         }
+         void Vert(int x) {        
+		    int counter = 0;
+		for (int i = 0; i < my; i++){
+			data[x + mx * (counter - 1) - 1] = 1;
+			counter++;
+		}
+
+	}
+        void Gor(int y) {      
+		       int counter = mx * (y - 1);
+		        for (int i = 0; i < mx; i++){
+			        data[counter] = 1;
+			        counter++;
+		}
+            
+        }
+	
+             
+         
+    };
+    image a(10,10);
+int main(){
+    cout<<"enter x"<<endl;
+    cin>>x;
+    a.image::GetMx(x);
+    cout<<"enter y"<<endl;
+    cin>>y;
+    a.image::GetMy(y);
+    int nx=0;
+    int ny=0;
+        for(int i=0;i<x*y;i++){
+            int k =   rand();
+            k=k%2;
+            a.image::set(nx,ny,k);
+            nx++;
+            if(nx%x==0){
+            ny++;
+            nx=0;
+            }
+    }
+    a.image::show();
+    a.image::save();
+    return 0;
+}
