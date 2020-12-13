@@ -1,0 +1,109 @@
+#include <iostream>
+#include <thread>
+#include <ctime>
+
+using namespace std;
+
+int mx = 100;
+int my = 20;
+int counter;
+bool check = 0;
+int gist[255]={0};
+
+
+void Show(int *ptr) {  
+    cout << "Image: " << endl;
+    counter = 0;
+		for (int i = 0; i < mx*my; i++) {
+
+			cout << ptr[i] << " ";
+			counter++;
+			if (counter == mx) {
+				cout << endl;
+				counter = 0;
+			}
+
+		}
+		counter = 0;
+    cout << endl;
+}
+
+void Fill(int *ptr, int first, int second){    
+
+
+    cout << "Number of thread: " << this_thread::get_id() << endl;
+    int i =0;   
+     for (first; i < second; i++) {
+        gist [ptr [i]] = gist [ptr [i]] + 1;
+    }
+    i = 0;
+        
+}
+
+void ShowGist() {   
+    cout << "Gist: " << endl;
+    for (int i = 1; i < 256; i++) {
+            cout << i << " ";
+            for (int j = 0; j < gist[i]; j++){
+                cout  << "*" << " ";
+            }
+            cout << endl;
+        }
+    cout << endl;
+}
+
+int main() {
+
+    int *ptr;
+
+    ptr = new int[mx*my];  
+
+    for (int i = 0; i < mx*my; i++) { 
+			ptr[i] = rand() % 256;
+		}
+
+
+
+    thread th1(Fill, std::ref(ptr), 100, 200); 
+    thread th2(Fill, std::ref(ptr), 200, 300);
+    thread th3(Fill, std::ref(ptr), 300, 400);
+    thread th4(Fill, std::ref(ptr), 400, 500);
+    thread th5(Fill, std::ref(ptr), 500, 600);
+    thread th6(Fill, std::ref(ptr), 600, 700);
+    thread th7(Fill, std::ref(ptr), 700, 800);
+    thread th8(Fill, std::ref(ptr), 800, 1000);
+    thread th9(Fill, std::ref(ptr), 1002, 1500);
+    thread th10(Fill, std::ref(ptr), 1500, 1700);
+    thread th11(Fill, std::ref(ptr), 1700, 1800);
+    thread th12(Fill, std::ref(ptr), 1800, 1850);
+    thread th13(Fill, std::ref(ptr), 1850, 1900);
+    thread th14(Fill, std::ref(ptr), 1900, 1950);
+    thread th15(Fill, std::ref(ptr), 1950, 2000);
+
+    
+    Fill(ptr, 0, 100); 
+
+    th1.join();
+    th2.join();
+    th3.join();
+    th4.join();
+    th5.join();
+    th6.join();
+    th7.join();
+    th8.join();
+    th9.join();
+    th10.join();
+    th11.join();
+    th12.join();
+    th13.join();
+    th14.join();
+    th15.join();
+
+	ShowGist();
+
+
+    delete[] ptr;
+
+
+    return 0;
+}
