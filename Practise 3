@@ -40,12 +40,12 @@ void Fill(int *ptr, int first, int second){
         
 }
 
-void ShowGist() {   
-    cout << "Gist: " << endl;
+void GistShow() {   
+    cout << "Gist is: " << endl;
     for (int i = 1; i < 256; i++) {
             cout << i << " ";
             for (int j = 0; j < gist[i]; j++){
-                cout  << "*" << " ";
+                cout  << "*" << "  ";
             }
             cout << endl;
         }
@@ -72,7 +72,7 @@ int main() {
     thread th6(Fill, std::ref(ptr), 600, 700);
     thread th7(Fill, std::ref(ptr), 700, 800);
     thread th8(Fill, std::ref(ptr), 800, 1000);
-    thread th9(Fill, std::ref(ptr), 1002, 1500);
+    thread th9(Fill, std::ref(ptr), 1000, 1500);
     thread th10(Fill, std::ref(ptr), 1500, 1700);
     thread th11(Fill, std::ref(ptr), 1700, 1800);
     thread th12(Fill, std::ref(ptr), 1800, 1850);
@@ -99,7 +99,7 @@ int main() {
     th14.join();
     th15.join();
 
-	ShowGist();
+	GistShow();
 
 
     delete[] ptr;
