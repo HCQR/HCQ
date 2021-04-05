@@ -1,0 +1,359 @@
+#include <iostream>
+#include <cmath>
+#include <SFML/Graphics.hpp>
+#include <ctime>
+#include <chrono>
+#include <thread>
+
+
+using namespace sf;
+using namespace std;
+
+
+class Bear
+{
+
+public:
+
+	void bearMovement(RenderWindow &window)
+	{
+		CircleShape circle(30.f);			// сам пух в виде кружка 
+		circle.setFillColor(Color(209, 95, 238));
+		circle.setOutlineThickness(5.f); // Устанавливаем толщину контура круга
+		circle.setOutlineColor(Color(255, 182, 193)); // Устанавливаем цвет контура
+		circle.move(x, y - bear_h * 10.0);
+		window.draw(circle);
+	}
+
+
+	void setHeight()
+	{
+		cout << "Set height: ";
+		cin >> duploHeight;
+		height = duploHeight;
+	}
+
+	double getHeight()
+	{
+		if (mass > 15)
+		{
+			return 0;
+		}
+		else 
+		{
+			return duploHeight;
+		}
+		
+	}
+
+	void setBearMass()
+	{
+		cout << "Enter bear mass: ";
+		cin >> mass;
+	}
+
+	void EatHoney()
+	{
+		mass = mass + 0.5;
+		cout << endl << "Bear is eating honey...." << endl;
+		this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
+
+	double getBearMass()
+	{
+		return mass;
+	}
+
+
+	double Calculation(double t, double dt, double enginePower)
+	{
+
+		bear_h = bear_h0 + bear_v0 + bear_a * dt*dt / 2;
+		bear_v = bear_v0 + bear_a * dt;
+
+		if (bear_h < height)
+		{
+			if (abs(enginePower - 9.8*mass) < 0.0001)
+			{
+				bear_a = 0;
+			}
+			else
+			{
+				bear_a = (enginePower - 9.8*mass) / mass; // m * a = mg - F
+			}
+
+			bear_h0 = bear_h;
+
+		}
+		else if (bear_h > height)
+		{
+			bear_a = (enginePower + 9.8*mass) / mass; // m * a = mg - F
+			check = 1;
+		}
+
+		bear_v0 = bear_v;
+
+		if (abs(bear_h - duploHeight) < 2.2)
+		{
+			mass = mass + 0.5;
+			cout << endl << "Bear is eating honey...." << endl << "Bear mass: " << mass << endl;
+
+		}
+	
+		if (check && (bear_h < 0.01))
+		{
+			bear_h = 0;
+		}
+
+		return bear_h;
+	};
+
+
+private:
+
+	double mass;
+	double height;
+	double duploHeight;
+	double bear_a = 0;
+	double bear_h = 0;
+	double bear_h0 = 0;
+	double bear_v = 0;
+	double bear_v0 = 0;
+	double dt;
+	double t;
+	bool check = 0;
+	double enginePower;
+
+	int x = 370;
+	int y = 800;
+
+};
+
+
+class Controller {
+
+public:
+
+	double getCurrentHight()
+	{
+		return currentHeight;
+	};
+
+	double powerCalculation() // расчет мощности двигателя
+	{
+
+	};
+
+	void setMass(double incomingMass)
+	{
+
+		mass = mass + incomingMass;
+
+	};
+
+private:
+
+	double settedHeight;
+	double currentHeight = 0;
+	double a = 0;
+	double velocity = 0;
+	double mass;
+
+};
+
+
+class PIDImpl
+{
+public:
+	
+	PIDImpl(double dt, double max, double min, double Kp, double Kd, double Ki);
+	~PIDImpl();
+	// Returns the manipulated variable given a setpoint and current process value
+	double calculate(double setpoint, double currHight);
+
+private:
+	double _dt;
+	double _max;
+	double _min;
+	double _Kp;
+	double _Kd;
+	double _Ki;
+	double _pre_error;
+	double _integral;
+};
+
+
+PIDImpl::PIDImpl(double dt, double max, double min, double Kp, double Kd, double Ki) :
+	_dt(dt),   
+	_max(max),
+	_min(min),
+	_Kp(Kp),
+	_Kd(Kd),
+	_Ki(Ki),
+	_pre_error(0),
+	_integral(0)
+{
+}
+
+
+double PIDImpl::calculate(double setpoint, double currHight) {
+
+	double error = setpoint - currHight;	// Calculate error
+
+	double Pout = _Kp * error;	// Proportional term
+
+	_integral += error * _dt;	// Integral term
+	double Iout = _Ki * _integral;
+	
+	double derivative = (error - _pre_error) / _dt;	// Derivative term
+	double Dout = _Kd * derivative;
+
+	double output = Pout + Iout + Dout;	// Calculate total output
+
+	if (output > _max)	// Restrict to max/min
+		output = _max;
+	else if (output < _min)
+		output = _min;
+
+	_pre_error = error;		// Save error to previous error
+
+	return output;
+}
+
+PIDImpl::~PIDImpl()
+{
+}
+
+
+class Terrain
+{
+
+public:
+
+	void drawTerrain(RenderWindow& window)
+	{
+		RectangleShape tree(Vector2f(100.f, 750.f));  // дерево
+		tree.move(450, 130);
+		tree.setFillColor(Color(85, 25, 30));
+		window.draw(tree);
+	
+		RectangleShape ground(Vector2f(800.f, 110.f));  // gnd
+		ground.move(0, 850);
+		ground.setFillColor(Color(59, 115, 52));
+		window.draw(ground);
+	
+		RectangleShape textSpace1(Vector2f(280.f, 100.f));  // прямогугольник для текста
+		textSpace1.move(0, 800);
+		textSpace1.setFillColor(Color(128, 128, 128));
+		window.draw(textSpace1);
+
+		CircleShape duplo(20.f);
+		duplo.setFillColor(Color(50, 12, 0));
+		duplo.setOutlineThickness(2.f); // Устанавливаем толщину контура круга
+		duplo.setOutlineColor(Color(140, 82, 77)); // Устанавливаем цвет контура
+		duplo.move(460, 300);
+		window.draw(duplo);
+
+		CircleShape leafs(90.f);
+		leafs.setFillColor(Color(59, 122, 50));
+		leafs.setOutlineThickness(2.f); // Устанавливаем толщину контура круга
+		leafs.setOutlineColor(Color(50, 112, 50)); // Устанавливаем цвет контура
+		leafs.move(410, 70);
+		window.draw(leafs);
+	}
+
+
+};
+
+
+	
+void drawText(RenderWindow& window, string str)
+{
+	Text txtH; // объявляем текст sfml
+	Font font;		// выбор стиля шрифта и указание его алреса
+	font.loadFromFile("C:/Windows/Fonts/calibri.ttf");
+	txtH.setFont(font);		// задание стиля текста
+	txtH.setPosition(30, 850);		// позиция текста
+	txtH.setString(str);		// помещаем текст 
+	txtH.setCharacterSize(25);		// size of a text
+	txtH.setStyle(Text::Bold);		// жирный текст
+	window.draw(txtH);		// отрисовка текста
+}
+
+
+
+int main()
+{
+	// Объект, который, собственно, является главным окном приложения
+	RenderWindow window(VideoMode(800, 900), "Pooh is flying", Style::Close);
+	Font font;		// выбор стиля шрифта и указание его алреса
+	font.loadFromFile("C:/Windows/Fonts/calibri.ttf");
+
+	int x = 370;		// начальные координаты пуха
+	int y = 800;
+
+	Terrain terrain;
+
+	Bear Pooh;		// создание объекта класса медведь
+
+	Pooh.setHeight();		// выставление высоты подъема
+
+	Pooh.setBearMass();   // задание массы медведя
+
+	PIDImpl pid(0.5, 100, -100, 1.0, 0.001, 0.008);
+	
+	float t = 0; // Время моделирования
+	float enginePower = 0; // n 0..500 n
+	float enginePowerPercent = 0; // 0..100
+	float h = 0;
+	float dt = 0.1; // s
+	
+	float hZad = 0; // Измененение высоты за шаг моделирования
+
+	string strH; // строка для вывода текста высоты 
+
+	while (window.isOpen())	// Главный цикл приложения. Выполняется, пока открыто окно
+	{
+
+		Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed)	// если нажали крестик, то закрываем окно
+				window.close();
+		}
+
+		enginePower = enginePowerPercent * (500. / 100.);
+
+		h = Pooh.Calculation(t, dt, enginePower);
+		
+		
+		hZad = Pooh.getHeight();
+		
+
+		enginePowerPercent = pid.calculate(hZad, h);
+
+		cout << "enginePower: " << enginePower << "		hZad:" << hZad << endl;
+
+		t = t + dt;
+
+		//cout << "Time: " << t << endl;
+
+		this_thread::sleep_for(std::chrono::milliseconds(8));
+
+		window.clear(Color(175, 180, 240, 0));	// Отрисовка окна
+
+		Pooh.bearMovement(window);
+
+		terrain.drawTerrain(window);
+
+		strH = "Height: " + to_string(h);	
+
+		drawText(window, strH);
+		
+		window.display();	// Отрисовка окна
+
+	}
+
+	return 0;
+	
+}
